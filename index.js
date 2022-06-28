@@ -11,6 +11,8 @@ morgan.token('data',(req,res)=>{
 
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :data '))
 
+app.use(express.static('build'))
+
 const persons = [
     { 
       "id": 1,
@@ -96,7 +98,7 @@ app.get('/info',(req,res)=>{
 
 
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT,()=>{
     console.log('server started')
