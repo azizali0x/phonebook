@@ -39,7 +39,7 @@ morgan.token('data',(req,res)=>{
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :data '))
 
 
-app.get('/api/persons',(req,res)=>{
+app.get('/api/persons',(req,res,next)=>{
 
     // Person.find({}).then(val=>{
     //     res.json(val)
@@ -50,35 +50,27 @@ app.get('/api/persons',(req,res)=>{
     Person.find({}).then((resp)=>{
         res.json(resp)
     }).catch(err=>{
-        console.error(err)
+        next(err)
     })
 })
 
-// app.get('/api/persons/:id',(req,res)=>{
-//     const id = req.params.id
-//     const getPerson = persons.filter((person)=> person.id === Number(id))
-//     if(getPerson.length !== 0){
-//         res.json(getPerson)
-//     }else{
-//         res.status(204).end()
-//     }
-// })
+app.get('/api/persons/:id',(req,res,next)=>{
 
-// app.delete('/api/persons/:id',(req,res)=>{
-//     const id = req.params.id;
-//     const index = persons.findIndex((person)=> person.id === Number(id))
-//     const removePerson = persons.splice(index,1)
+    Person.findById(req.params.id).then(resp=>{
+        if(resp){
+            res.status(200).json(resp)
+        }
+    }).catch(err=> next(err))
+})
 
-//     if(removePerson){
-//         res.status(200).end()
-//         console.log(persons)
-//     }else{
-//         res.status(204).end()
-//     }
+app.delete('/api/persons/:id',(req,res,next)=>{
 
-// })
+    Person.findByIdAndRemove(req.params.id).then(()=>{
+        res.status(200).end()
+    }).catch(err=> next(err))
+})
 
-app.post('/api/persons',(req,res)=>{
+app.post('/api/persons',(req,res,next)=>{
     if(req.body.name === undefined || req.body.number === undefined){
         res.status(400).json(
             "number or name can't be empty"
@@ -93,16 +85,34 @@ app.post('/api/persons',(req,res)=>{
     }
 })
 
-// app.get('/info',(req,res)=>{
-//     const time = new Date()
-//     res.send(
-//         `<p>Phonebook has info for ${persons.length} people<p>
-//          <p>${time}</p>
-//         `
-//     )
-// })
+app.put('/api/persons/:id',(req,res,next)=>{
+    console.log('yes')
+    Person.findByIdAndUpdate(req.params.id,{name: req.body.name,number: req.body.number},{new: true}).then(()=>{
+        res.status(204).end()
+    }).catch(err=> next(err))
+})
 
+app.get('/info',(req,res,next)=>{
+    const time = new Date()
+    Person.find({}).then((resp)=>{
+        res.send(
+            `<p>Phonebook has info for ${resp.length} people<p>
+             <p>${time}</p>
+            `
+        )
+    }).catch(err=> next(err))
+    
+})
 
+const errorHandler = (err,req,res,next)=>{
+    if(err.message){ 
+        console.log(err.message)
+         return res.status(400).json({message: err.message})
+    } 
+    next(err.message)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3000
 
