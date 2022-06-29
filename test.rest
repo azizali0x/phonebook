@@ -9,3 +9,7 @@ content-type: application/json
     "name": "zziz",
     "number":"39080398093"
 }
+
+### get person
+GET http://localhost:3001/api/persons/
+content-type: application/json
