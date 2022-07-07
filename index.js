@@ -86,7 +86,15 @@ app.post('/api/persons', (req, res, next)=>{
         'number or name can\'t be empty',
     );
   } else {
-    Pe;
+    const person = new Person({
+      name: req.body.name,
+      number: req.body.number,
+    });
+    person.save().then(()=>{
+      res.status(200).end();
+    }).catch((err)=>{
+      next(err);
+    });
   }
 });
 
