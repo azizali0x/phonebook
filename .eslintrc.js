@@ -4,9 +4,6 @@ module.exports = {
     'commonjs': true,
     'es2021': true,
   },
-  'extends': [
-    'google',
-  ],
   'parserOptions': {
     'ecmaVersion': 'latest',
   },
